@@ -27,6 +27,8 @@ defmodule MetaPidRequest.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "macroed"}
+    ]
   end
 end
