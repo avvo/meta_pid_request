@@ -14,7 +14,7 @@ defmodule MetaPidRequest.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :plug]]
   end
 
   # Dependencies can be Hex packages:
@@ -28,7 +28,8 @@ defmodule MetaPidRequest.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "macroed"}
+      {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "macroed"},
+      {:plug, only: [:test, :dev]}
     ]
   end
 end

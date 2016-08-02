@@ -1,6 +1,8 @@
-defmodule RequestMetadataTest do
+defmodule MetaPidRequest.RequestMetadataTest do
   use ExUnit.Case, async: true
-  doctest RequestMetadata
+  doctest MetaPidRequest.RequestMetadata
+
+  alias MetaPidRequest.RequestMetadata
 
   test "can be initialized without specific times" do
     structure = %RequestMetadata{
