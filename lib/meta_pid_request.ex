@@ -2,7 +2,7 @@ defmodule MetaPidRequest do
   alias MetaPidRequest.Registry
   alias MetaPidRequest.RequestMetadata
 
-  @spec start_link() :: pid()
+  @spec start_link() :: {:ok, pid()} | {:error, any()}
   def start_link() do
     Registry.start_link()
   end

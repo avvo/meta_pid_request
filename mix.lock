@@ -1,3 +1,4 @@
-%{"meta_pid": {:git, "git@github.com:avvo/meta_pid.git", "e14fe8db972a1575c89d8571f6438953aabe60e5", [branch: "macroed"]},
+%{"dialyxir": {:hex, :dialyxir, "0.3.5", "eaba092549e044c76f83165978979f60110dc58dd5b92fd952bf2312f64e9b14", [:mix], []},
+  "meta_pid": {:git, "git@github.com:avvo/meta_pid.git", "e14fe8db972a1575c89d8571f6438953aabe60e5", [branch: "macroed"]},
   "mime": {:hex, :mime, "1.0.0", "b63027733bba00b1013bad14e25dc8b6629ecb817731544a88a0fd14f2a55685", [:mix], []},
   "plug": {:hex, :plug, "1.2.0-rc.0", "08a3c6597103b7aa72f112a8d80eae7dea961bd082632e34778aee07800f70e8", [:mix], [{:cowboy, "~> 1.0", [hex: :cowboy, optional: true]}, {:mime, "~> 1.0", [hex: :mime, optional: false]}]}}

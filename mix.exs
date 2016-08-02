@@ -2,12 +2,15 @@ defmodule MetaPidRequest.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :meta_pid_request,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :meta_pid_request,
+      version: "0.1.0",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      dialyzer: [plt_add_deps: :transitive, plt_file: ".local.plt"]
+    ]
   end
 
   # Configuration for the OTP application
@@ -29,7 +32,8 @@ defmodule MetaPidRequest.Mixfile do
   defp deps do
     [
       {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "macroed"},
-      {:plug, only: [:test, :dev]}
+      {:plug, only: [:test, :dev]},
+      {:dialyxir, "~> 0.3.5", only: [:dev, :test]}
     ]
   end
 end
