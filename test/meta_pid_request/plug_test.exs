@@ -155,4 +155,61 @@ defmodule MetaPidRequest.PlugTest do
       assert results |> Enum.count == 10
     end
   end
+
+  describe "Scenario #3" do
+    defmodule Scenario3 do
+      use Plug.Builder
+
+      plug Plug.RequestId, http_header: "x-request-id"
+      plug MetaPidRequest.Plug
+      plug :scenario
+      plug :respond
+
+      def scenario(conn, _) do
+        parent = self
+
+        tasks = Enum.map(0..10, fn (n) ->
+          Task.async(fn () ->
+            MetaPidRequest.add_time(parent, :service_foo, n)
+          end)
+        end)
+
+        _ = tasks |> Task.yield_many()
+
+        {:ok, data} = MetaPidRequest.Registry.fetch_pid(parent)
+
+        ResultsServer.report_results(data)
+
+        conn
+      end
+
+      def respond(conn, _) do
+        conn |> send_resp(200, "ok")
+      end
+    end
+
+    setup do
+      {:ok, _} = Plug.Adapters.Cowboy.http(Scenario3, [], [ref: :scenario3])
+
+      on_exit fn () ->
+        Plug.Adapters.Cowboy.shutdown(:scenario3)
+      end
+
+      :ok
+    end
+
+    test "handles several concurrent tasks adding service call times for a pid" do
+      MetaPidRequest.Registry.fetch_pid(self)
+      HTTPoison.get!("http://localhost:4000")
+
+      results = ResultsServer.get_results()
+
+      assert results |> Enum.count == 1
+
+      times = results |> MapSet.to_list() |> hd |> Map.get(:times) |> Map.get(:service_foo)
+
+      assert times |> Enum.count == 11
+      assert times |> MapSet.new == (for n <- 0..10, into: MapSet.new do n end)
+    end
+  end
 end

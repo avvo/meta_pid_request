@@ -29,10 +29,8 @@ defmodule MetaPidRequest do
 
   @spec add_time(pid(), atom(), number) :: atom()
   def add_time(pid, key, value) do
-    {:ok, data} = Registry.fetch_pid(pid)
-
-    data
-    |> RequestMetadata.add_time(key, value)
-    |> (fn (updated) -> Registry.put_pid(pid, updated) end).()
+    Registry.transform_pid(pid, fn (metadata) ->
+      RequestMetadata.add_time(metadata, key, value)
+    end)
   end
 end
