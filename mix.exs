@@ -31,7 +31,6 @@ defmodule MetaPidRequest.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.9.0", only: [:test]},
       {:dialyxir, "~> 0.3.5", only: [:dev, :test]},
       {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "macroed"},
       {:plug, "~> 1.0"}

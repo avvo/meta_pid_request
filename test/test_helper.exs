@@ -1,2 +1,1 @@
-HTTPoison.start()
 ExUnit.start()
