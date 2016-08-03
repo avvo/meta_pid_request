@@ -4,8 +4,6 @@ defmodule MetaPidRequest.Plug do
 
   def init(opts), do: opts
 
-  require Logger
-
   @spec call(Conn.t, Plug.opts) :: Conn.t
   def call(conn, _options) do
     [request_id | _] = Conn.get_resp_header(conn, "x-request-id")
