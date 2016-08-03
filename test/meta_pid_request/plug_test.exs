@@ -1,215 +1,88 @@
 defmodule MetaPidRequest.PlugTest do
   use ExUnit.Case
+  use Plug.Test
 
   alias MetaPidRequest.RequestMetadata
-
-  def make_time_key(n) do
-    "service_#{n}" |> String.to_atom()
-  end
-
-  defmodule ResultsServer do
-    use GenServer
-
-    def start_link() do
-      GenServer.start_link(__MODULE__, nil, name: __MODULE__)
-    end
-
-    def stop() do
-      GenServer.stop(__MODULE__)
-    end
-
-    def report_results(data) do
-      GenServer.call(__MODULE__, {:report_results, data})
-    end
-
-    def get_results() do
-      GenServer.call(__MODULE__, :get_results)
-    end
-
-    def init(_) do
-      {:ok, MapSet.new}
-    end
-
-    def handle_call({:report_results, data}, _from, existing) do
-      {:reply, :ok, MapSet.put(existing, data)}
-    end
-
-    def handle_call(:get_results, _from, data) do
-      {:reply, data, data}
-    end
-  end
 
   setup do
     {:ok, pid} = MetaPidRequest.start_link()
     %{server: pid}
   end
 
-  setup do
-    {:ok, pid} = ResultsServer.start_link()
-    %{results_server: pid}
+  defp run_scenario(scenario_fn) do
+    t = Task.async(fn () ->
+      conn_pid = self
+
+      conn(:get, "/")
+      |> Plug.RequestId.call(Plug.RequestId.init([]))
+      |> MetaPidRequest.Plug.call([])
+
+      scenario_fn.(conn_pid)
+
+      MetaPidRequest.fetch_metadata(conn_pid)
+    end)
+
+    {:ok, result} = Task.await(t)
+
+    result
   end
 
-  describe "Scenario #1" do
-    defmodule Scenario1 do
-      use Plug.Builder
-
-      plug Plug.RequestId, http_header: "x-request-id"
-      plug MetaPidRequest.Plug
-      plug :scenario
-      plug :respond
-
-      def scenario(conn, _) do
-        Enum.each(0..10, fn (n) ->
-          {:ok, data} = MetaPidRequest.fetch_metadata(self)
-
-          data
-          |> RequestMetadata.add_time(MetaPidRequest.PlugTest.make_time_key(n), n)
-          |> (fn (data) -> MetaPidRequest.put_metadata(self, data) end).()
-        end)
-
-        {:ok, data} = MetaPidRequest.fetch_metadata(self)
-
-        MetaPidRequest.PlugTest.ResultsServer.report_results(data)
-
-        conn
-      end
-
-      def respond(conn, _) do
-        conn |> send_resp(200, "ok")
-      end
-    end
-
-    setup do
-      {:ok, _} = Plug.Adapters.Cowboy.http(Scenario1, [], [ref: :scenario1])
-
-      on_exit fn () ->
-        Plug.Adapters.Cowboy.shutdown(:scenario1)
-      end
-
-      :ok
-    end
-
-    test "handles a single connection with a synchronous operation" do
-      HTTPoison.get!("http://localhost:4000")
-
-      results  = ResultsServer.get_results() |> MapSet.to_list |> hd |> Map.get(:times)
-      expected = Enum.reduce(0..10, Map.new, fn (n, acc) ->
-        Map.put(acc, make_time_key(n), [n])
-      end)
-
-      assert results == expected
-    end
+  defp make_time_key(n) do
+    "service_#{n}" |> String.to_atom()
   end
 
-  describe "Scenario #2" do
-    defmodule Scenario2 do
-      use Plug.Builder
-
-      plug Plug.RequestId, http_header: "x-request-id"
-      plug MetaPidRequest.Plug
-      plug :scenario
-      plug :respond
-
-      def scenario(conn, _) do
-        {:ok, data} = MetaPidRequest.fetch_metadata(self)
-
-        time_key = "#{data.request_id}-service" |> String.to_atom
+  test "handles a single connection with a synchronous operation" do
+    result = run_scenario(fn (conn_pid) ->
+      Enum.each(0..10, fn (n) ->
+        {:ok, data} = MetaPidRequest.fetch_metadata(conn_pid)
 
         data
-        |> RequestMetadata.add_time(time_key, 5)
-        |> (fn (data) -> MetaPidRequest.put_metadata(self, data) end).()
+        |> RequestMetadata.add_time(make_time_key(n), n)
+        |> (fn (data) -> MetaPidRequest.put_metadata(conn_pid, data) end).()
+      end)
+    end)
 
-        {:ok, data} = MetaPidRequest.fetch_metadata(self)
+    expected = Enum.reduce(0..10, Map.new, fn (n, acc) ->
+      Map.put(acc, make_time_key(n), [n])
+    end)
 
-        MetaPidRequest.PlugTest.ResultsServer.report_results(data)
+    assert result.times == expected
+  end
 
-        conn
-      end
+  test "handles several concurrent connections each with a synchronous operation" do
+    tasks = Enum.map(0..9, fn (_) ->
+      Task.async(fn () ->
+        run_scenario(fn (conn_pid) ->
+          {:ok, data} = MetaPidRequest.fetch_metadata(conn_pid)
 
-      def respond(conn, _) do
-        conn |> send_resp(200, "ok")
-      end
-    end
+          time_key = "#{data.request_id}-service" |> String.to_atom()
 
-    setup do
-      {:ok, _} = Plug.Adapters.Cowboy.http(Scenario2, [], [ref: :scenario2])
+          data
+          |> RequestMetadata.add_time(time_key, 5)
+          |> (fn (data) -> MetaPidRequest.put_metadata(conn_pid, data) end).()
+        end)
+      end)
+    end)
 
-      on_exit fn () ->
-        Plug.Adapters.Cowboy.shutdown(:scenario2)
-      end
+    results = tasks |> Task.yield_many() |> Enum.map(fn ({_, {:ok, result}}) -> result end)
 
-      :ok
-    end
+    assert results |> Enum.count == 10
+  end
 
-    test "handles several concurrent connections each with a synchronous operation" do
-      tasks = Enum.map(0..9, fn (_) ->
+  test "handles several concurrent tasks within a single connection adding service call times for a pid" do
+    result = run_scenario(fn (conn_pid) ->
+      tasks = Enum.map(0..10, fn (n) ->
         Task.async(fn () ->
-          HTTPoison.get!("http://localhost:4000")
+          MetaPidRequest.add_time(conn_pid, :service_foo, n)
         end)
       end)
 
-      _ = tasks |> Task.yield_many()
+      _ = Task.yield_many(tasks)
+    end)
 
-      results = ResultsServer.get_results()
+    times = result.times |> Map.get(:service_foo)
 
-      assert results |> Enum.count == 10
-    end
-  end
-
-  describe "Scenario #3" do
-    defmodule Scenario3 do
-      use Plug.Builder
-
-      plug Plug.RequestId, http_header: "x-request-id"
-      plug MetaPidRequest.Plug
-      plug :scenario
-      plug :respond
-
-      def scenario(conn, _) do
-        parent = self
-
-        tasks = Enum.map(0..10, fn (n) ->
-          Task.async(fn () ->
-            MetaPidRequest.add_time(parent, :service_foo, n)
-          end)
-        end)
-
-        _ = tasks |> Task.yield_many()
-
-        {:ok, data} = MetaPidRequest.Registry.fetch_pid(parent)
-
-        ResultsServer.report_results(data)
-
-        conn
-      end
-
-      def respond(conn, _) do
-        conn |> send_resp(200, "ok")
-      end
-    end
-
-    setup do
-      {:ok, _} = Plug.Adapters.Cowboy.http(Scenario3, [], [ref: :scenario3])
-
-      on_exit fn () ->
-        Plug.Adapters.Cowboy.shutdown(:scenario3)
-      end
-
-      :ok
-    end
-
-    test "handles several concurrent tasks adding service call times for a pid" do
-      MetaPidRequest.Registry.fetch_pid(self)
-      HTTPoison.get!("http://localhost:4000")
-
-      results = ResultsServer.get_results()
-
-      assert results |> Enum.count == 1
-
-      times = results |> MapSet.to_list() |> hd |> Map.get(:times) |> Map.get(:service_foo)
-
-      assert times |> Enum.count == 11
-      assert times |> MapSet.new == (for n <- 0..10, into: MapSet.new do n end)
-    end
+    assert times |> Enum.count == 11
+    assert times |> MapSet.new == (for n <- 0..10, into: MapSet.new do n end)
   end
 end
