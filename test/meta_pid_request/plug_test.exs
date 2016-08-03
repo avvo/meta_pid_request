@@ -4,11 +4,6 @@ defmodule MetaPidRequest.PlugTest do
 
   alias MetaPidRequest.RequestMetadata
 
-  setup do
-    {:ok, pid} = MetaPidRequest.start_link()
-    %{server: pid}
-  end
-
   defp run_scenario(scenario_fn) do
     t = Task.async(fn () ->
       conn_pid = self

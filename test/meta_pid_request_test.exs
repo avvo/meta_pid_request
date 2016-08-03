@@ -4,12 +4,6 @@ defmodule MetaPidRequestTest do
 
   doctest MetaPidRequest
 
-  setup do
-    pid = MetaPidRequest.start_link()
-
-    %{server: pid}
-  end
-
   test "registers a request with a time for the passed pid" do
     MetaPidRequest.register_request(self, "asdf")
 

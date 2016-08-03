@@ -1,10 +1,12 @@
 defmodule MetaPidRequest do
+  use Application
+
   alias MetaPidRequest.Registry
   alias MetaPidRequest.RequestMetadata
+  alias MetaPidRequest.Supervisor
 
-  @spec start_link() :: {:ok, pid()} | {:error, any()}
-  def start_link() do
-    Registry.start_link()
+  def start(_type, _args) do
+    Supervisor.start_link()
   end
 
   @spec register_request(pid(), String.t) :: atom()
