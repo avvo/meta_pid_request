@@ -19,21 +19,20 @@ defmodule MetaPidRequest do
 
   @spec put_metadata(pid(), RequestMetadata.t) :: atom()
   def put_metadata(pid, metadata) do
-    Registry.put_pid(pid |> request_pid, metadata)
+    Registry.put_pid(pid, metadata)
   end
 
   @spec fetch_metadata(pid()) :: {:ok, RequestMetadata.t} | :error
   def fetch_metadata(pid) do
-    Registry.fetch_pid(pid |> request_pid)
+    Registry.fetch_pid(pid)
   end
 
-  @spec request_pid(pid()) :: pid()
-  defp request_pid(pid) do
-    registry = Registry.get_registry()
+  @spec add_time(pid(), atom(), number) :: atom()
+  def add_time(pid, key, value) do
+    {:ok, data} = Registry.fetch_pid(pid)
 
-    case Map.has_key?(registry, pid) do
-      true -> pid
-      false -> Process.info(pid)[:group_leader]
-    end
+    data
+    |> RequestMetadata.add_time(key, value)
+    |> (fn (updated) -> Registry.put_pid(pid, updated) end).()
   end
 end
