@@ -29,11 +29,7 @@ defmodule MetaPidRequest.PlugTest do
   test "handles a single connection with a synchronous operation" do
     result = run_scenario(fn (conn_pid) ->
       Enum.each(0..10, fn (n) ->
-        {:ok, data} = MetaPidRequest.fetch_metadata(conn_pid)
-
-        data
-        |> RequestMetadata.add_time(make_time_key(n), n)
-        |> (fn (data) -> MetaPidRequest.put_metadata(conn_pid, data) end).()
+        MetaPidRequest.add_time(conn_pid, make_time_key(n), n)
       end)
     end)
 
@@ -49,12 +45,9 @@ defmodule MetaPidRequest.PlugTest do
       Task.async(fn () ->
         run_scenario(fn (conn_pid) ->
           {:ok, data} = MetaPidRequest.fetch_metadata(conn_pid)
-
           time_key = "#{data.request_id}-service" |> String.to_atom()
 
-          data
-          |> RequestMetadata.add_time(time_key, 5)
-          |> (fn (data) -> MetaPidRequest.put_metadata(conn_pid, data) end).()
+          MetaPidRequest.add_time(conn_pid, time_key, 5)
         end)
       end)
     end)

@@ -1,9 +1,7 @@
 defmodule MetaPidRequest do
   use Application
 
-  alias MetaPidRequest.Registry
-  alias MetaPidRequest.RequestMetadata
-  alias MetaPidRequest.Supervisor
+  alias MetaPidRequest.{Registry, RequestMetadata, Supervisor}
 
   def start(_type, _args) do
     Supervisor.start_link()
@@ -17,11 +15,6 @@ defmodule MetaPidRequest do
     }
 
     Registry.register_pid(pid, data)
-  end
-
-  @spec put_metadata(pid(), RequestMetadata.t) :: atom()
-  def put_metadata(pid, metadata) do
-    Registry.put_pid(pid, metadata)
   end
 
   @spec fetch_metadata(pid()) :: {:ok, RequestMetadata.t} | :error
