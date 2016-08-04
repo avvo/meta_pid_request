@@ -35,7 +35,7 @@ defmodule MetaPidRequest.Mixfile do
   defp deps do
     [
       {:dialyxir, "~> 0.3.5", only: [:dev, :test]},
-      {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "macroed"},
+      {:meta_pid, git: "git@github.com:avvo/meta_pid.git", branch: "master"},
       {:plug, "~> 1.0"}
     ]
   end
