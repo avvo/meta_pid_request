@@ -44,9 +44,6 @@ It exposes a Plug to make managing this life cycle easier.
     # (this is handled automatically by the plug)
     MetaPidRequest.register_request(pid, request_id)
 
-    # To replace data for a particular pid
-    MetaPidRequest.put_metadata(pid, metadata)
-
     # To retrieve metadata for a pid
     MetaPidRequest.fetch_metadata(pid)
 
