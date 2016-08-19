@@ -2,8 +2,6 @@ defmodule MetaPidRequest.PlugTest do
   use ExUnit.Case
   use Plug.Test
 
-  alias MetaPidRequest.RequestMetadata
-
   defp run_scenario(scenario_fn) do
     t = Task.async(fn () ->
       conn_pid = self
