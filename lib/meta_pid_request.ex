@@ -22,6 +22,14 @@ defmodule MetaPidRequest do
     Registry.fetch_pid(pid)
   end
 
+  @spec fetch_request_id(pid()) :: String.t | nil
+  def fetch_request_id(pid) do
+    case fetch_metadata(pid) do
+      {:ok, metadata} -> metadata.request_id
+      _ -> nil
+    end
+  end
+
   @spec add_time(pid(), atom(), number) :: atom()
   def add_time(pid, key, value) do
     Registry.transform_pid(pid, fn (metadata) ->

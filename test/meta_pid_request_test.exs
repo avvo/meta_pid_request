@@ -14,9 +14,18 @@ defmodule MetaPidRequestTest do
     assert data.times == %{}
   end
 
-  test "retrives a registered pid's data" do
+  test "retrieves a registered pid's data" do
     MetaPidRequest.register_request(self, "asdf")
     assert MetaPidRequest.Registry.fetch_pid(self) == MetaPidRequest.fetch_metadata(self)
+  end
+
+  test "retrieves a registered pid's request id if one exists" do
+    MetaPidRequest.register_request(self, "asdf")
+    assert MetaPidRequest.fetch_request_id(self) == "asdf"
+  end
+
+  test "returns nil if can't find metadata for passed pid" do
+    assert MetaPidRequest.fetch_request_id(self) == nil
   end
 
   test "adds a time to the specified service list for a pid" do
