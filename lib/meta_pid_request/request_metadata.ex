@@ -1,7 +1,7 @@
 defmodule MetaPidRequest.RequestMetadata do
   @type t :: %__MODULE__{
     request_id: String.t | nil,
-    start_time: number() | nil,
+    start_time: integer() | nil,
     times:      %{atom() => list(number)}
   }
   defstruct request_id: nil, start_time: nil, times: %{}
