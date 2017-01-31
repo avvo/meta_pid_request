@@ -8,7 +8,7 @@ defmodule MetaPidRequest.Plug do
   def call(conn, _options) do
     [request_id | _] = Conn.get_resp_header(conn, "x-request-id")
 
-    MetaPidRequest.register_request(self, request_id)
+    self() |> MetaPidRequest.register_request(request_id)
 
     conn
   end
