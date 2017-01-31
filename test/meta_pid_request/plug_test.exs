@@ -4,7 +4,7 @@ defmodule MetaPidRequest.PlugTest do
 
   defp run_scenario(scenario_fn) do
     t = Task.async(fn () ->
-      conn_pid = self
+      conn_pid = self()
 
       conn(:get, "/")
       |> Plug.RequestId.call(Plug.RequestId.init([]))
