@@ -22,7 +22,7 @@ defmodule MetaPidRequest.Mixfile do
 
   defp deps do
     [
-      {:meta_pid, git: "git@github.com:avvo/meta_pid.git"},
+      {:meta_pid, "~> 0.2"},
       {:plug, "~> 1.0"},
 
       # NON-PRODUCTION DEPS
