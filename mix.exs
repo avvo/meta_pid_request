@@ -9,7 +9,7 @@ defmodule MetaPidRequest.Mixfile do
       dialyzer: [plt_add_deps: :transitive, plt_file: ".local.plt"],
       elixir: "~> 1.4",
       start_permanent: Mix.env == :prod,
-      version: "0.2.0"
+      version: "0.2.1"
     ]
   end
 
@@ -23,10 +23,10 @@ defmodule MetaPidRequest.Mixfile do
   defp deps do
     [
       {:meta_pid, "~> 0.2"},
-      {:plug, "~> 1.0"},
+      {:plug, "~> 1.3"},
 
       # NON-PRODUCTION DEPS
-      {:dialyxir, "~> 0.4", only: [:dev, :test]}
+      {:dialyxir, "~> 0.5", only: [:dev, :test]}
     ]
   end
 end
