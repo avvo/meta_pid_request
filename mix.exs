@@ -6,7 +6,10 @@ defmodule MetaPidRequest.Mixfile do
       app: :meta_pid_request,
       build_embedded: Mix.env == :prod,
       deps: deps(),
-      dialyzer: [plt_add_deps: :transitive, plt_file: ".local.plt"],
+      dialyzer: [
+        plt_add_deps: :transitive,
+        plt_file: {:no_warn, ".local.plt"}
+      ],
       elixir: "~> 1.4",
       start_permanent: Mix.env == :prod,
       version: "0.2.1"
