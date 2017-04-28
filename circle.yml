@@ -1,0 +1,34 @@
+---
+version: 2
+jobs:
+  build:
+    working_directory: /root/meta_pid_request
+
+    docker:
+      - image: avvo/elixir-circleci:1.4.1-4
+
+    environment:
+      MIX_ENV: test
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: meta_pid_request-cache-{{ .Branch }}
+          key: meta_pid_request-cache-master
+
+      - run: mix do deps.get, deps.compile, compile
+
+      - run:
+          name: Run Tests
+          command: mix test
+
+      - run: mix dialyzer
+
+      - save_cache:
+          key: meta_pid_request-cache-{{ .Branch }}
+          paths:
+            - _build
+            - deps
+            - .local.plt
+            - .local.plt.hash

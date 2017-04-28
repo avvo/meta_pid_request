@@ -11,7 +11,6 @@ process.
 
 It exposes a Plug to make managing this life cycle easier.
 
-
 ## Installation
 
   1. Add `meta_pid_request` to your list of dependencies in `mix.exs`:
@@ -50,3 +49,10 @@ It exposes a Plug to make managing this life cycle easier.
     # To add a service call time for a pid
     MetaPidRequest.add_time(pid, service_name, duration)
   ```
+
+## Development
+
+To test:
+```
+mix test
+```

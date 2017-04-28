@@ -1,4 +1,4 @@
-%{"dialyxir": {:hex, :dialyxir, "0.4.3", "a4daeebd0107de10d3bbae2ccb6b8905e69544db1ed5fe9148ad27cd4cb2c0cd", [:mix], []},
-  "meta_pid": {:hex, :meta_pid, "0.2.0", "91b12687e80f23d4cebda95274b153a7fe7cfe5bb1e6a7717708cba2eac3a7f5", [:mix], []},
-  "mime": {:hex, :mime, "1.0.1", "05c393850524767d13a53627df71beeebb016205eb43bfbd92d14d24ec7a1b51", [:mix], []},
-  "plug": {:hex, :plug, "1.3.0", "6e2b01afc5db3fd011ca4a16efd9cb424528c157c30a44a0186bcc92c7b2e8f3", [:mix], [{:cowboy, "~> 1.0.1 or ~> 1.1", [hex: :cowboy, optional: true]}, {:mime, "~> 1.0", [hex: :mime, optional: false]}]}}
+%{"dialyxir": {:hex, :dialyxir, "0.5.0", "5bc543f9c28ecd51b99cc1a685a3c2a1a93216990347f259406a910cf048d1d7", [:mix], []},
+  "meta_pid": {:hex, :meta_pid, "0.2.1", "ace1862dc2630830fa944fe0cf5e2271b067c0ae4f19c540afa6b39008cf804b", [:mix], []},
+  "mime": {:hex, :mime, "1.1.0", "01c1d6f4083d8aa5c7b8c246ade95139620ef8effb009edde934e0ec3b28090a", [:mix], []},
+  "plug": {:hex, :plug, "1.3.5", "7503bfcd7091df2a9761ef8cecea666d1f2cc454cbbaf0afa0b6e259203b7031", [:mix], [{:cowboy, "~> 1.0.1 or ~> 1.1", [hex: :cowboy, optional: true]}, {:mime, "~> 1.0", [hex: :mime, optional: false]}]}}
