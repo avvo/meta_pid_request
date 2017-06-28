@@ -5,7 +5,7 @@ jobs:
     working_directory: /opt/app/meta_pid_request
 
     docker:
-      - image: avvo/elixir-circleci:1.4.5-1d
+      - image: avvo/elixir-circleci:1.4.5-1e
 
     environment:
       MIX_ENV: test
