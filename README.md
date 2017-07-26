@@ -15,28 +15,23 @@ It exposes a Plug to make managing this life cycle easier.
 
   1. Add `meta_pid_request` to your list of dependencies in `mix.exs`:
 
-    ```elixir
     def deps do
       [
         {:meta_pid_request, "~> 0.2.1"},
       ]
     end
-    ```
 
   2. Ensure `meta_pid_request` is started before your application if you're on Elixir &lt; 1.4:
 
-    ```elixir
     def application do
       [applications: [:meta_pid_request]]
     end
-    ```
 
   3. Use the Plug in any pipelined HTTP application to initialize entries in the registry
-
-    ```elixir
-      # works best if included after Plug.RequestId
-      plug MetaPidRequest.Plug
-    ```
+```
+# works best if included after Plug.RequestId
+plug MetaPidRequest.Plug
+```
 
 ## Use
 
