@@ -17,11 +17,13 @@ It exposes a Plug to make managing this life cycle easier.
 
     ```elixir
     def deps do
-      {:meta_pid_request, git: "git@github.com:avvo/meta_pid_request.git"}
+      [
+        {:meta_pid_request, "~> 0.2.1"},
+      ]
     end
     ```
 
-  2. Ensure `meta_pid_request` is started before your application:
+  2. Ensure `meta_pid_request` is started before your application if you're on Elixir &lt; 1.4:
 
     ```elixir
     def application do
