@@ -31,7 +31,8 @@ defmodule MetaPidRequest.Mixfile do
       {:plug, "~> 1.3"},
 
       # NON-PRODUCTION DEPS
-      {:dialyxir, "~> 0.5", only: [:dev, :test]}
+      {:dialyxir, "~> 0.5", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: :dev},
     ]
   end
 
